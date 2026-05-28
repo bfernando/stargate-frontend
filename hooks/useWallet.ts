@@ -8,6 +8,16 @@ export interface WalletConnectionError {
   message: string;
 }
 
+/**
+ * Manages wallet discovery, connection state, and connection errors.
+ *
+ * @returns Available wallets, the active wallet, public key, connect action,
+ * connection error helpers, and connection progress state.
+ *
+ * @example
+ * const { wallets, publicKey, connect, isConnecting } = useWallet();
+ * await connect(wallets[0]);
+ */
 export function useWallet() {
   const [wallet, setWallet] = useState<WalletSigner | null>(null);
   const [publicKey, setPublicKey] = useState<string | null>(null);

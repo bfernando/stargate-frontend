@@ -5,6 +5,15 @@ import { invoiceStatusUrl } from '@/lib/sse';
 
 export type InvoiceStatus = 'pending' | 'paid' | 'expired' | 'cancelled';
 
+/**
+ * Subscribes to live invoice status updates over server-sent events.
+ *
+ * @param invoiceId - Invoice identifier used to build the status event stream URL.
+ * @returns Current status, paid timestamp, loading state, and any connection error.
+ *
+ * @example
+ * const { status, paidAt, loading, error } = useInvoiceStatus(invoice.id);
+ */
 export function useInvoiceStatus(invoiceId: string) {
   const [status, setStatus] = useState<InvoiceStatus>('pending');
   const [paidAt, setPaidAt] = useState<string | null>(null);
