@@ -5,16 +5,20 @@ export interface WalletSigner {
   isAvailable(): boolean;
 }
 
+const FREIGHTER_NOT_INSTALLED = 'Freighter extension is not installed. Please install it from https://freighter.app and reload the page.';
+
 export const FreighterSigner: WalletSigner = {
   name: 'Freighter',
   isAvailable: () => typeof window !== 'undefined' && !!(window as any).freighter,
   async getPublicKey() {
+    if (!FreighterSigner.isAvailable()) throw new Error(FREIGHTER_NOT_INSTALLED);
     const { requestAccess } = await import('@stellar/freighter-api');
     const result = await requestAccess();
     if (result.error) throw new Error(result.error.message ?? 'Freighter access was denied');
     return result.address;
   },
   async signTransaction(xdr, network) {
+    if (!FreighterSigner.isAvailable()) throw new Error(FREIGHTER_NOT_INSTALLED);
     const { signTransaction } = await import('@stellar/freighter-api');
     const result = await signTransaction(xdr, { networkPassphrase: networkPassphrase(network) });
     if (result.error) throw new Error(result.error.message ?? 'Freighter could not sign the transaction');

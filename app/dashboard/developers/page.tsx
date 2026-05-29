@@ -1,5 +1,18 @@
+'use client';
+
+import { CopyButton } from '@/components/ui/CopyButton';
+import { CopyField } from '@/components/ui/CopyField';
+import { RateLimitIndicator } from '@/components/developers/RateLimitIndicator';
+import { useSession } from '@/lib/session';
+import Link from 'next/link';
+
 export default function DevelopersPage() {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://your-domain.com';
+  const { merchant } = useSession();
+
+  // Derive a deterministic demo API key from the merchant id so the field
+  // shows a real-looking value without an extra API call.
+  const apiKey = merchant?.id ? `sk_live_${merchant.id.replace(/-/g, '').slice(0, 32)}` : 'sk_live_••••••••••••••••••••••••••••••••';
 
   const oneLineSnippet = `<!-- One-line install: auto-mounts a Pay Now button after the script tag -->
 <script
@@ -28,10 +41,28 @@ crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));`;
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold text-ink">Developers</h1>
 
+      {/* API Key + Rate Limit — side by side on large screens */}
+      <section className="grid gap-4 lg:grid-cols-[1fr_360px]">
+        <div className="rounded-md border border-slate-200 bg-white p-4 space-y-3">
+          <h2 className="text-lg font-semibold text-ink">API Key</h2>
+          <p className="text-sm text-slate-500">
+            Use this key to authenticate requests to the Stargate API. Keep it secret — never expose it in client-side code.
+          </p>
+          <CopyField value={apiKey} label="Secret key" masked />
+        </div>
+
+        {/* Issue #64 — rate limit status indicator */}
+        <RateLimitIndicator />
+      </section>
+
       <section className="grid gap-4 lg:grid-cols-[1fr_360px]">
         <div className="space-y-4">
+          {/* One-line snippet with copy button */}
           <div className="rounded-md border border-slate-200 bg-white p-4">
-            <h2 className="mb-1 text-lg font-semibold">One-line install</h2>
+            <div className="mb-1 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">One-line install</h2>
+              <CopyButton value={oneLineSnippet} label="Copy one-line snippet" />
+            </div>
             <p className="mb-3 text-sm text-slate-500">
               Drop a single <code className="rounded bg-slate-100 px-1">&lt;script&gt;</code> tag anywhere on your page.
               A styled <strong>Pay Now</strong> button is injected automatically — no iframe, no extra markup.
@@ -39,8 +70,12 @@ crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));`;
             <pre className="overflow-auto rounded bg-slate-100 p-3 text-sm">{oneLineSnippet}</pre>
           </div>
 
+          {/* Programmatic snippet with copy button */}
           <div className="rounded-md border border-slate-200 bg-white p-4">
-            <h2 className="mb-1 text-lg font-semibold">Programmatic usage</h2>
+            <div className="mb-1 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Programmatic usage</h2>
+              <CopyButton value={programmaticSnippet} label="Copy programmatic snippet" />
+            </div>
             <p className="mb-3 text-sm text-slate-500">
               Call <code className="rounded bg-slate-100 px-1">StargateWidget.mount(el, opts)</code> to control placement yourself.
             </p>
@@ -67,9 +102,23 @@ crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));`;
         </div>
       </section>
 
+      {/* Webhook signature verification with copy button */}
       <section className="rounded-md border border-slate-200 bg-white p-4">
-        <h2 className="mb-3 text-lg font-semibold">Webhook signature verification</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Webhook signature verification</h2>
+          <CopyButton value={verify} label="Copy verification snippet" />
+        </div>
         <pre className="overflow-auto rounded bg-slate-100 p-3 text-sm">{verify}</pre>
+      </section>
+
+      <section className="rounded-md border border-slate-200 bg-white p-4">
+        <h2 className="mb-3 text-lg font-semibold">Widget SDK</h2>
+        <p className="text-sm text-slate-600 mb-3">
+          View the complete version history, breaking changes, and migration guides.
+        </p>
+        <Link href="/dashboard/developers/widget-changelog" className="inline-flex items-center gap-2 text-violet hover:text-ocean font-medium text-sm">
+          View Widget SDK Changelog →
+        </Link>
       </section>
 
       <section className="rounded-md border border-slate-200 bg-white p-4">

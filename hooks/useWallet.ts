@@ -60,9 +60,10 @@ export function useWallet() {
       const message = err instanceof Error ? err.message : String(err);
       console.error('Wallet connection error:', { wallet: next.name, error: message });
 
+      const isNotInstalled = message.includes('not installed');
       setError({
-        code: 'CONNECTION_ERROR',
-        message: `Failed to connect with ${next.name}. ${message}`,
+        code: isNotInstalled ? 'WALLET_NOT_INSTALLED' : 'CONNECTION_ERROR',
+        message: isNotInstalled ? message : `Failed to connect with ${next.name}. ${message}`,
       });
       setWallet(null);
       setPublicKey(null);

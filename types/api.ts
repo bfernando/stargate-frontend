@@ -113,6 +113,8 @@ export interface CreateDisputeResponseDto {
 export interface UploadEvidenceDto {
   file: File;
   description?: string;
+}
+
 export type TeamMemberRole = 'owner' | 'admin' | 'developer' | 'viewer';
 export type TeamMemberStatus = 'active' | 'pending' | 'suspended';
 
@@ -145,4 +147,155 @@ export interface InviteTeamMemberDto {
 export interface UpdateTeamMemberDto {
   role?: TeamMemberRole;
   status?: TeamMemberStatus;
+}
+
+// ─── Multi-currency display ────────────────────────────────────────────────
+export type CurrencyDisplayMode = 'settlement' | 'original';
+
+export interface CurrencyDisplaySettings {
+  mode: CurrencyDisplayMode;
+  settlement_currency: string;
+}
+
+// ─── Audit log ─────────────────────────────────────────────────────────────
+export type AuditAction =
+  | 'merchant.updated'
+  | 'invoice.created'
+  | 'invoice.cancelled'
+  | 'payment.received'
+  | 'webhook.created'
+  | 'webhook.deleted'
+  | 'team.invited'
+  | 'team.removed'
+  | 'team.role_changed'
+  | 'dispute.opened'
+  | 'dispute.responded'
+  | 'settings.changed'
+  | 'api_key.generated'
+  | 'api_key.revoked'
+  | 'login'
+  | 'logout'
+  | 'branding.updated'
+  | 'ab_test.created'
+  | 'ab_test.updated';
+
+export interface AuditLogEntry {
+  id: string;
+  merchant_id: string;
+  actor_email: string;
+  action: AuditAction;
+  resource_type: string;
+  resource_id?: string;
+  details?: Record<string, any>;
+  ip_address: string;
+  user_agent?: string;
+  created_at: string;
+}
+
+export interface AuditLogListResponse {
+  page: number;
+  limit: number;
+  total: number;
+  items: AuditLogEntry[];
+}
+
+// ─── Branding / Payment page customisation ─────────────────────────────────
+export interface BrandingSettings {
+  logo_url?: string;
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  cta_text: string;
+  cta_background_color: string;
+  cta_text_color: string;
+  font_family?: string;
+  show_merchant_name: boolean;
+}
+
+// ─── A/B test variants ─────────────────────────────────────────────────────
+export interface ABTestVariant {
+  id: string;
+  name: string;
+  traffic_percentage: number;
+  branding: BrandingSettings;
+  is_control: boolean;
+}
+
+export interface ABTest {
+  id: string;
+  merchant_id: string;
+  name: string;
+  description?: string;
+  status: 'draft' | 'running' | 'paused' | 'completed';
+  variants: ABTestVariant[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateABTestDto {
+  name: string;
+  description?: string;
+  variants: {
+    name: string;
+    traffic_percentage: number;
+    branding: BrandingSettings;
+  }[];
+export interface ApiKey {
+  id: string;
+  merchant_id: string;
+  name: string;
+  key: string;
+  scopes: string[];
+  last_used_at?: string;
+  created_at: string;
+  revoked_at?: string;
+}
+
+export interface ApiKeyListResponse {
+  page: number;
+  limit: number;
+  total: number;
+  items: ApiKey[];
+}
+
+export interface CreateApiKeyDto {
+  name: string;
+  scopes: string[];
+}
+
+export interface UpdateApiKeyDto {
+  name?: string;
+}
+
+export interface WebhookDelivery {
+  id: string;
+  webhook_id: string;
+  event: string;
+  status: 'pending' | 'success' | 'failed';
+  response_status?: number;
+  response_body?: string;
+  latency_ms: number;
+  created_at: string;
+}
+
+export interface WebhookDeliveryListResponse {
+  page: number;
+  limit: number;
+  total: number;
+  items: WebhookDelivery[];
+}
+
+export interface InvoiceTimeline {
+  id: string;
+  invoice_id: string;
+  event_type: 'created' | 'viewed' | 'paid' | 'settled' | 'expired' | 'cancelled';
+  description: string;
+  created_at: string;
+}
+
+export interface MerchantBalance {
+  usdc: string;
+  eurc: string;
+  xlm: string;
+  updated_at: string;
 }

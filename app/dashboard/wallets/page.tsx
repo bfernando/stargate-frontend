@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { CopyButton } from '@/components/ui/CopyButton';
 import { Input } from '@/components/ui/Input';
 
 const balances = [
@@ -38,7 +39,15 @@ export default function WalletsPage() {
             <Wallet size={18} className="text-violet" />
             <h2 className="font-semibold text-ink">Crypto settlement address</h2>
           </div>
-          <Input value={destination} onChange={(event) => setDestination(event.target.value)} placeholder="G... Stellar settlement address" />
+          <div className="flex items-center gap-1">
+            <Input
+              value={destination}
+              onChange={(event) => setDestination(event.target.value)}
+              placeholder="G... Stellar settlement address"
+              className="flex-1"
+            />
+            {destination && <CopyButton value={destination} label="Copy wallet address" />}
+          </div>
           <div className="flex gap-2">
             <Button>Verify ownership</Button>
             <Button className="bg-white text-ink ring-1 ring-slate-300 hover:bg-slate-50">Open explorer</Button>
